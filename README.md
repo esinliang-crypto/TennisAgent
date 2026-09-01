@@ -37,7 +37,7 @@ Not implemented yet:
 ```bash
 npm run susf:login
 npm run susf:check
-npm run preference:set -- "我主要想便宜，最好后一小时也没人，13点前或者17点以后都行"
+npm run preference:set -- "选一个最近几天的连续两小时没人的最便宜的场地，13点前或者17点以后都行，尽量不要在边上的court3和court6"
 npm run preference:show
 npm run candidates
 npm run preview
