@@ -1,0 +1,6 @@
+.auth/
+output/
+node_modules/
+.env
+data/preferences.json
+.DS_Store

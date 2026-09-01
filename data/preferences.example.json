@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "searchWindowDays": 7,
+  "preferences": [
+    {
+      "feature": "price",
+      "type": "soft",
+      "direction": "lower",
+      "importance": "high"
+    },
+    {
+      "feature": "next_hour_free",
+      "type": "soft",
+      "target": true,
+      "importance": "high"
+    },
+    {
+      "feature": "start_time",
+      "type": "soft",
+      "rule": {
+        "before": "13:00",
+        "after": "17:00"
+      },
+      "importance": "medium"
+    }
+  ],
+  "hardConstraints": [],
+  "unresolvedPreferences": [],
+  "sourceText": "我主要想便宜，最好后一小时也没人，13点前或者17点以后都行",
+  "updatedAt": "2026-09-01T00:00:00.000Z"
+}

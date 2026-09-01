@@ -1,0 +1,20 @@
+{
+  "name": "tennis-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "susf:login": "node scripts/login-susf.mjs",
+    "susf:check": "node scripts/check-susf.mjs",
+    "preference:set": "node scripts/set-preferences.mjs",
+    "preference:show": "node scripts/show-preferences.mjs",
+    "candidates": "node scripts/build-candidates.mjs",
+    "preview": "node scripts/preference-preview.mjs",
+    "susf:price-trace": "node scripts/trace-susf-price.mjs",
+    "eval:preferences": "node eval/run-preference-eval.mjs",
+    "test": "node --test tests/*.test.mjs && node --check scripts/login-susf.mjs && node --check scripts/check-susf.mjs && node --check scripts/set-preferences.mjs && node --check scripts/show-preferences.mjs && node --check scripts/build-candidates.mjs && node --check scripts/preference-preview.mjs && node --check scripts/trace-susf-price.mjs && node --check eval/run-preference-eval.mjs && node --check packages/susf/src/session.mjs && node --check packages/susf/src/availability.mjs && node --check packages/susf/src/index.mjs && node --check packages/preferences/src/schema.mjs && node --check packages/preferences/src/openai-schema.mjs && node --check packages/preferences/src/interpreter.mjs && node --check packages/preferences/src/store.mjs && node --check packages/preferences/src/index.mjs && node --check packages/core/src/types.mjs && node --check packages/core/src/features.mjs && node --check packages/core/src/candidates.mjs && node --check packages/core/src/index.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.62.1"
+  }
+}
