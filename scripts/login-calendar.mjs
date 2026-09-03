@@ -52,7 +52,7 @@ const server = createServer(async (request, response) => {
 
 await new Promise((resolve) => server.listen(Number(redirectUrl.port), redirectUrl.hostname, resolve));
 
-console.log('Opening Google OAuth consent screen for Calendar FreeBusy access.');
+console.log('Opening Google OAuth consent screen for fallback Calendar FreeBusy access.');
 spawn('open', [authUrl], {
   detached: true,
   stdio: 'ignore',

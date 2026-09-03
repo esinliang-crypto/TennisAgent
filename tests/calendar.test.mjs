@@ -69,6 +69,7 @@ test('FreeBusy adapter exposes busy intervals only', async () => {
     start: '2026-09-03T00:00:00.000Z',
     end: '2026-09-04T00:00:00.000Z',
     timezone: 'Australia/Sydney',
+    providerMode: 'google',
     accessToken: 'test-token',
     fetchImpl: async (_url, options) => {
       requestBody = JSON.parse(options.body);

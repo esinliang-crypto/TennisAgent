@@ -51,7 +51,12 @@ function attachWeather(candidates, weatherRows) {
   }));
 }
 
-function attachCalendar(candidates, busyIntervals, { status = 'available' } = {}) {
+function attachCalendar(candidates, busyIntervals, {
+  status = 'available',
+  source = null,
+  fallbackFrom,
+  fallbackReason,
+} = {}) {
   return candidates.map((candidate) => ({
     ...candidate,
     features: {
@@ -59,6 +64,9 @@ function attachCalendar(candidates, busyIntervals, { status = 'available' } = {}
       calendar: {
         free: status === 'available' ? isCalendarFree(candidate, busyIntervals) : null,
         status,
+        source,
+        ...(fallbackFrom ? { fallbackFrom } : {}),
+        ...(fallbackReason ? { fallbackReason } : {}),
       },
     },
   }));
@@ -79,6 +87,9 @@ async function enrichCandidates({
   });
 
   let calendarStatus = 'available';
+  let calendarSource = null;
+  let calendarFallbackFrom;
+  let calendarFallbackReason;
   let busyIntervals = [];
   const window = candidateSearchWindow(candidates);
   if (window) {
@@ -88,6 +99,10 @@ async function enrichCandidates({
         end: window.end,
         timezone,
       });
+      calendarStatus = calendar.status ?? 'available';
+      calendarSource = calendar.source ?? null;
+      calendarFallbackFrom = calendar.fallbackFrom;
+      calendarFallbackReason = calendar.fallbackReason;
       busyIntervals = calendar.busy ?? [];
     } catch (error) {
       calendarStatus = error.code ?? 'calendar_error';
@@ -96,6 +111,9 @@ async function enrichCandidates({
 
   return attachCalendar(attachWeather(candidates, weatherRows), busyIntervals, {
     status: calendarStatus,
+    source: calendarSource,
+    fallbackFrom: calendarFallbackFrom,
+    fallbackReason: calendarFallbackReason,
   });
 }
 

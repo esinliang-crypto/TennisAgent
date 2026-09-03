@@ -44,8 +44,9 @@ npm run preference:show
 npm run candidates
 npm run preview
 npm run weather:check
-npm run calendar:login
+npm run calendar:authorize
 npm run calendar:check
+npm run calendar:login
 npm run feasible
 npm test
 ```
@@ -54,7 +55,11 @@ npm test
 
 Weather uses Open-Meteo hourly forecasts. Candidate start times are mapped to the containing local forecast hour in `Australia/Sydney`, so `18:15` and `18:30` both use the `18:00` hourly row for that local date. Forecasts are requested in batches for the candidate date window and cached in memory for 20 minutes.
 
-Calendar uses Google Calendar FreeBusy only. It stores the OAuth refresh token locally at `.auth/google-calendar.json` and exposes only busy intervals to candidate enrichment; event titles, descriptions, attendees, and locations are not returned to Candidate Core.
+Calendar uses a provider selector. The local-first default is `CALENDAR_PROVIDER=auto`: on macOS it tries Apple Calendar through EventKit first, then falls back to Google Calendar FreeBusy if Apple is unavailable or denied and Google is configured. `CALENDAR_PROVIDER=apple` disables Google fallback; `CALENDAR_PROVIDER=google` skips Apple and uses Google only.
+
+Apple Calendar uses macOS system Calendar permission through EventKit. It does not need an Apple ID, Apple password, iCloud private API, Calendar database access, or UI automation. `npm run calendar:authorize` explicitly asks macOS for Calendar access. The Swift bridge only returns busy intervals and never returns event titles, notes, attendees, URLs, descriptions, or locations.
+
+Google Calendar is an optional fallback for non-macOS, cloud deployment, or other users. It uses the FreeBusy API with `https://www.googleapis.com/auth/calendar.freebusy`, stores the OAuth refresh token locally at `.auth/google-calendar.json`, and exposes only busy intervals to candidate enrichment.
 
 Hard filtering is deterministic. Calendar busy is a default hard rejection; Calendar unknown is not treated as free. Weather is factual enrichment only unless the Preference Profile contains an explicit hard weather constraint, in which case unknown weather is not treated as good weather.
 

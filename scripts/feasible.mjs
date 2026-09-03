@@ -89,6 +89,8 @@ const enriched = await enrichCandidates({
     : undefined,
   calendarAdapter: syntheticMode
     ? async () => ({
+      source: 'synthetic',
+      status: 'available',
       busy: [
         { start: '2026-09-03T09:15:00.000Z', end: '2026-09-03T09:45:00.000Z' },
       ],

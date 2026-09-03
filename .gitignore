@@ -9,3 +9,4 @@ data/preferences.json
 *.secret
 *.cache
 storageState.json
+.build/

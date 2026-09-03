@@ -14,9 +14,22 @@ export {
 export {
   CalendarAdapterError,
   GOOGLE_CALENDAR_FREEBUSY_URL,
+  GoogleCalendarProviderError,
+  createCalendarProviderSet,
   getCalendarBusy,
   normalizeBusyIntervals,
+  normalizeProviderMode,
 } from './adapter.mjs';
+
+export {
+  APPLE_EVENTKIT_SOURCE,
+  AppleCalendarProviderError,
+  DEFAULT_APPLE_CALENDAR_HELPER_DIR,
+  createAppleEventKitProvider,
+  createGoogleFreeBusyProvider,
+  normalizeAppleNativeResult,
+  parseAppleHelperStdout,
+} from './providers/index.mjs';
 
 export {
   intervalEnd,
