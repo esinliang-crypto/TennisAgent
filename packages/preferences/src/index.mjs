@@ -1,9 +1,13 @@
 export {
   PREFERENCE_VERSION,
   PreferenceSchemaError,
+  allowedDateRangeTypes,
   allowedDirections,
   allowedFeatures,
   allowedImportance,
+  allowedObjectiveDirections,
+  allowedObjectiveFeatures,
+  allowedPeriods,
   allowedTypes,
   normalizePreferenceProfile,
   validatePreferenceProfile,

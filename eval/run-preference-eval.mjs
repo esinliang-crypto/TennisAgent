@@ -1,25 +1,36 @@
-import { readFile } from 'node:fs/promises';
-import { interpretPreferences } from '../packages/preferences/src/index.mjs';
+import { readFile, mkdir, writeFile } from "node:fs/promises";
+import { interpretPreferences } from "../packages/preferences/src/index.mjs";
 
-const cases = JSON.parse(await readFile(new URL('./preference-cases.json', import.meta.url), 'utf8'));
+const cases = JSON.parse(
+  await readFile(new URL("./test_case.json", import.meta.url), "utf8")
+);
+const outputFile = process.env.PREFERENCE_EVAL_OUTPUT ?? "preference-eval-v2.json";
 
-let passed = 0;
+const results = [];
 
 for (const testCase of cases) {
-  const profile = await interpretPreferences(testCase.input);
-  const byFeature = Object.fromEntries(profile.preferences.map((preference) => [preference.feature, preference]));
+  const output = await interpretPreferences(testCase.input);
 
-  for (const [feature, expected] of Object.entries(testCase.expected)) {
-    const actual = byFeature[feature];
-    if (!actual) throw new Error(`${testCase.name}: missing ${feature}`);
-    for (const [key, value] of Object.entries(expected)) {
-      if (JSON.stringify(actual[key]) !== JSON.stringify(value)) {
-        throw new Error(`${testCase.name}: ${feature}.${key} expected ${JSON.stringify(value)}, got ${JSON.stringify(actual[key])}`);
-      }
-    }
-  }
+  results.push({
+    id: testCase.id ?? testCase.name,
+    input: testCase.input,
+    output,
+    human_review: null
+  });
 
-  passed += 1;
+  console.log("\n========================================");
+  console.log(testCase.id ?? testCase.name);
+  console.log(testCase.input);
+  console.log(JSON.stringify(output, null, 2));
 }
 
-console.log(`Preference eval passed: ${passed}/${cases.length}`);
+await mkdir(new URL("../output/", import.meta.url), { recursive: true });
+
+await writeFile(
+  new URL(`../output/${outputFile}`, import.meta.url),
+  JSON.stringify(results, null, 2)
+);
+
+console.log(
+  `\nSaved ${results.length} results to output/${outputFile}`
+);

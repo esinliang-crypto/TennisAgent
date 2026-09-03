@@ -1,178 +1,262 @@
 import {
+  allowedDateRangeTypes,
   allowedDirections,
   allowedFeatures,
   allowedImportance,
+  allowedObjectiveDirections,
+  allowedObjectiveFeatures,
+  allowedPeriods,
   allowedRelaxationDirections,
 } from './schema.mjs';
 
+const nullableString = { type: ['string', 'null'] };
+const nullableBoolean = { type: ['boolean', 'null'] };
+const nullableNumber = { type: ['number', 'null'] };
+const nullableInteger = { type: ['integer', 'null'] };
 const timeSchema = {
   type: ['string', 'null'],
   pattern: '^([01]\\d|2[0-3]):[0-5]\\d$',
 };
-
-const ruleSchema = {
-  type: ['object', 'null'],
-  additionalProperties: false,
-  required: ['before', 'after', 'equals'],
-  properties: {
-    before: timeSchema,
-    after: timeSchema,
-    equals: timeSchema,
-  },
+const dateSchema = {
+  type: ['string', 'null'],
+  pattern: '^\\d{4}-\\d{2}-\\d{2}$',
 };
 
-const softPreferenceSchema = {
-  type: 'object',
-  additionalProperties: false,
-  required: [
-    'feature',
-    'type',
-    'importance',
-    'priority',
-    'relaxable',
-    'relaxationDirection',
-    'sourceText',
-    'direction',
-    'target',
-    'rule',
-  ],
-  properties: {
-    feature: {
-      type: 'string',
-      enum: [...allowedFeatures],
-    },
-    type: {
-      type: 'string',
-      enum: ['soft'],
-    },
-    importance: {
-      type: 'string',
-      enum: [...allowedImportance],
-    },
-    priority: {
-      type: 'string',
-      enum: [...allowedImportance],
-    },
-    relaxable: {
-      type: 'boolean',
-    },
-    relaxationDirection: {
-      type: ['string', 'null'],
-      enum: [...allowedRelaxationDirections, null],
-    },
-    sourceText: {
-      type: ['string', 'null'],
-    },
+function strictObject(properties) {
+  return {
+    type: 'object',
+    additionalProperties: false,
+    required: Object.keys(properties),
+    properties,
+  };
+}
+
+function nullableStrictObject(properties) {
+  return {
+    ...strictObject(properties),
+    type: ['object', 'null'],
+  };
+}
+
+const timeRangeSchema = strictObject({
+  start: timeSchema,
+  end: timeSchema,
+});
+
+const dateRangeSchema = nullableStrictObject({
+  type: {
+    type: ['string', 'null'],
+    enum: [...allowedDateRangeTypes, null],
+  },
+  startDate: dateSchema,
+  endDate: dateSchema,
+  value: nullableString,
+  sourceText: nullableString,
+});
+
+const startTimeRuleSchema = nullableStrictObject({
+  before: timeSchema,
+  after: timeSchema,
+  equals: timeSchema,
+  between: {
+    anyOf: [timeRangeSchema, { type: 'null' }],
+  },
+  exclude: {
+    type: ['array', 'null'],
+    items: timeRangeSchema,
+  },
+  period: {
+    type: ['string', 'null'],
+    enum: [...allowedPeriods, null],
+  },
+});
+
+const priceRuleSchema = nullableStrictObject({
+  max: nullableNumber,
+  min: nullableNumber,
+  preferredRange: nullableStrictObject({
+    min: nullableNumber,
+    max: nullableNumber,
+  }),
+});
+
+const listRuleSchema = nullableStrictObject({
+  include: {
+    type: ['array', 'null'],
+    items: { type: 'string' },
+  },
+  exclude: {
+    type: ['array', 'null'],
+    items: { type: 'string' },
+  },
+  values: {
+    type: ['array', 'null'],
+    items: { type: 'string' },
+  },
+});
+
+const durationRuleSchema = nullableStrictObject({
+  exactMinutes: nullableInteger,
+  minMinutes: nullableInteger,
+  maxMinutes: nullableInteger,
+});
+
+const consecutiveAvailabilityRuleSchema = nullableStrictObject({
+  minMinutes: nullableInteger,
+  preferredMinutes: nullableInteger,
+});
+
+const courtCountRuleSchema = nullableStrictObject({
+  exact: nullableInteger,
+  min: nullableInteger,
+  max: nullableInteger,
+});
+
+const adjacencyRuleSchema = nullableStrictObject({
+  required: nullableBoolean,
+  preferred: nullableBoolean,
+});
+
+const travelTimeRuleSchema = nullableStrictObject({
+  maxMinutes: nullableInteger,
+  preferredMaxMinutes: nullableInteger,
+});
+
+const weatherRuleSchema = nullableStrictObject({
+  condition: {
+    type: ['string', 'null'],
+    enum: ['no_rain', 'no_precipitation', 'not_too_hot', 'comfortable', null],
+  },
+  maxTemperatureC: nullableNumber,
+});
+
+const calendarRuleSchema = nullableStrictObject({
+  noConflict: nullableBoolean,
+});
+
+const nextHourFreeRuleSchema = nullableStrictObject({
+  preferredMinutes: nullableInteger,
+});
+
+const ruleByFeature = {
+  price: priceRuleSchema,
+  next_hour_free: nextHourFreeRuleSchema,
+  start_time: startTimeRuleSchema,
+  date: nullableStrictObject({ dateRange: dateRangeSchema }),
+  court: listRuleSchema,
+  venue: listRuleSchema,
+  travel_time: travelTimeRuleSchema,
+  weather: weatherRuleSchema,
+  calendar: calendarRuleSchema,
+  duration: durationRuleSchema,
+  consecutive_availability: consecutiveAvailabilityRuleSchema,
+  court_count: courtCountRuleSchema,
+  adjacency: adjacencyRuleSchema,
+};
+
+function preferenceItemSchema(feature, type) {
+  return strictObject({
+    feature: { type: 'string', enum: [feature] },
+    type: { type: 'string', enum: [type] },
+    importance: { type: 'string', enum: [...allowedImportance] },
+    priority: { type: 'string', enum: [...allowedImportance] },
+    relaxable: type === 'hard' ? { type: 'boolean', enum: [false] } : { type: 'boolean' },
+    relaxationDirection: type === 'hard'
+      ? { type: ['string', 'null'], enum: [null] }
+      : { type: ['string', 'null'], enum: [...allowedRelaxationDirections, null] },
+    sourceText: nullableString,
     direction: {
       type: ['string', 'null'],
       enum: [...allowedDirections, null],
     },
-    target: {
-      type: ['boolean', 'null'],
-    },
-    rule: ruleSchema,
-  },
+    target: nullableBoolean,
+    value: nullableString,
+    rule: ruleByFeature[feature],
+  });
+}
+
+const softPreferenceSchema = {
+  anyOf: [...allowedFeatures].map((feature) => preferenceItemSchema(feature, 'soft')),
 };
 
 const hardConstraintSchema = {
-  type: 'object',
-  additionalProperties: false,
-  required: [
-    'feature',
-    'type',
-    'importance',
-    'priority',
-    'relaxable',
-    'relaxationDirection',
-    'sourceText',
-    'direction',
-    'target',
-    'rule',
-  ],
-  properties: {
-    feature: {
-      type: 'string',
-      enum: [...allowedFeatures],
-    },
-    type: {
-      type: 'string',
-      enum: ['hard'],
-    },
-    importance: {
-      type: 'string',
-      enum: [...allowedImportance],
-    },
-    priority: {
-      type: 'string',
-      enum: [...allowedImportance],
-    },
-    relaxable: {
-      type: 'boolean',
-      enum: [false],
-    },
-    relaxationDirection: {
-      type: ['string', 'null'],
-      enum: [null],
-    },
-    sourceText: {
-      type: ['string', 'null'],
-    },
-    direction: {
-      type: ['string', 'null'],
-      enum: [...allowedDirections, null],
-    },
-    target: {
-      type: ['boolean', 'null'],
-    },
-    rule: ruleSchema,
-  },
+  anyOf: [...allowedFeatures].map((feature) => preferenceItemSchema(feature, 'hard')),
 };
 
-const openAiPreferenceProfileJsonSchema = {
-  type: 'object',
-  additionalProperties: false,
-  required: [
-    'version',
-    'searchWindowDays',
-    'preferences',
-    'hardConstraints',
-    'unresolvedPreferences',
-    'sourceText',
-    'updatedAt',
-  ],
-  properties: {
-    version: { type: 'integer', enum: [1] },
-    searchWindowDays: { type: 'integer', minimum: 1, maximum: 30 },
-    preferences: {
-      type: 'array',
-      items: softPreferenceSchema,
-    },
-    hardConstraints: {
-      type: 'array',
-      items: hardConstraintSchema,
-    },
-    unresolvedPreferences: {
-      type: 'array',
-      items: { type: 'string' },
-    },
-    sourceText: { type: 'string' },
-    updatedAt: { type: 'string' },
+const objectiveSchema = strictObject({
+  feature: {
+    type: 'string',
+    enum: [...allowedObjectiveFeatures],
   },
-};
+  direction: {
+    type: 'string',
+    enum: [...allowedObjectiveDirections],
+  },
+  priority: {
+    type: 'string',
+    enum: [...allowedImportance],
+  },
+  sourceText: nullableString,
+});
+
+const searchScopeSchema = strictObject({
+  days: { type: 'integer', minimum: 1, maximum: 30 },
+  dateRange: dateRangeSchema,
+  timeWindow: startTimeRuleSchema,
+  location: nullableString,
+  sourceText: nullableString,
+});
+
+const unresolvedPreferenceSchema = strictObject({
+  text: { type: 'string' },
+  reason: nullableString,
+  sourceText: nullableString,
+});
+
+const openAiPreferenceProfileJsonSchema = strictObject({
+  version: { type: 'integer', enum: [2] },
+  searchWindowDays: { type: 'integer', minimum: 1, maximum: 30 },
+  searchScope: searchScopeSchema,
+  preferences: {
+    type: 'array',
+    items: softPreferenceSchema,
+  },
+  hardConstraints: {
+    type: 'array',
+    items: hardConstraintSchema,
+  },
+  objectives: {
+    type: 'array',
+    items: objectiveSchema,
+  },
+  unresolvedPreferences: {
+    type: 'array',
+    items: unresolvedPreferenceSchema,
+  },
+  sourceText: { type: 'string' },
+  updatedAt: { type: 'string' },
+});
 
 function collectObjectSchemas(schema, path = '#', out = []) {
   if (!schema || typeof schema !== 'object') return out;
 
   const types = Array.isArray(schema.type) ? schema.type : [schema.type];
-  if (types.includes('object')) {
-    out.push({ path, schema });
-  }
+  if (types.includes('object')) out.push({ path, schema });
 
   for (const [key, child] of Object.entries(schema.properties ?? {})) {
     collectObjectSchemas(child, `${path}/properties/${key}`, out);
   }
 
   if (schema.items) collectObjectSchemas(schema.items, `${path}/items`, out);
+  for (const [index, child] of (schema.anyOf ?? []).entries()) {
+    collectObjectSchemas(child, `${path}/anyOf/${index}`, out);
+  }
+  for (const [index, child] of (schema.oneOf ?? []).entries()) {
+    collectObjectSchemas(child, `${path}/oneOf/${index}`, out);
+  }
+  for (const [index, child] of (schema.allOf ?? []).entries()) {
+    collectObjectSchemas(child, `${path}/allOf/${index}`, out);
+  }
   for (const [key, child] of Object.entries(schema.$defs ?? {})) {
     collectObjectSchemas(child, `${path}/$defs/${key}`, out);
   }

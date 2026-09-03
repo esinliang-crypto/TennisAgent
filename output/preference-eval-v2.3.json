@@ -1,0 +1,899 @@
+[
+  {
+    "id": "case_001",
+    "input": "我主要想便宜，最好后一小时也没人，13点前或者17点以后都行",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "timeWindow": {
+          "before": "13:00",
+          "after": "17:00"
+        },
+        "sourceText": "13点前或者17点以后都行"
+      },
+      "preferences": [
+        {
+          "feature": "next_hour_free",
+          "type": "soft",
+          "importance": "medium",
+          "priority": "medium",
+          "relaxable": true,
+          "relaxationDirection": "wider_time_window",
+          "sourceText": "最好后一小时也没人",
+          "direction": "preferred",
+          "target": true,
+          "rule": {
+            "preferredMinutes": 60
+          }
+        }
+      ],
+      "hardConstraints": [
+        {
+          "feature": "start_time",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "13点前或者17点以后都行",
+          "rule": {
+            "before": "13:00",
+            "after": "17:00"
+          }
+        }
+      ],
+      "objectives": [
+        {
+          "feature": "price",
+          "direction": "minimize",
+          "priority": "high",
+          "sourceText": "我主要想便宜"
+        }
+      ],
+      "unresolvedPreferences": [],
+      "sourceText": "我主要想便宜，最好后一小时也没人，13点前或者17点以后都行",
+      "updatedAt": "2026-09-03T16:02:04.996Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_002",
+    "input": "选一个最近几天的连续两小时没人的最便宜的场地，13点前或者17点以后都行，尽量不要在边上的Court 3和Court 6",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 3,
+      "searchScope": {
+        "days": 3,
+        "dateRange": {
+          "type": "next_few_days",
+          "sourceText": "最近几天"
+        },
+        "timeWindow": {
+          "before": "13:00",
+          "after": "17:00"
+        },
+        "sourceText": "最近几天 13点前或者17点以后"
+      },
+      "preferences": [
+        {
+          "feature": "court",
+          "type": "soft",
+          "importance": "medium",
+          "priority": "medium",
+          "relaxable": true,
+          "relaxationDirection": "include_nonpreferred",
+          "sourceText": "尽量不要在边上的Court 3和Court 6",
+          "direction": "avoid",
+          "value": "Court 3 and Court 6",
+          "rule": {
+            "exclude": [
+              "Court 3",
+              "Court 6"
+            ]
+          }
+        }
+      ],
+      "hardConstraints": [
+        {
+          "feature": "consecutive_availability",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "连续两小时没人的",
+          "target": true,
+          "rule": {
+            "minMinutes": 120
+          }
+        },
+        {
+          "feature": "start_time",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "13点前或者17点以后",
+          "rule": {
+            "before": "13:00",
+            "after": "17:00"
+          }
+        }
+      ],
+      "objectives": [
+        {
+          "feature": "price",
+          "direction": "minimize",
+          "priority": "high",
+          "sourceText": "最便宜的"
+        }
+      ],
+      "unresolvedPreferences": [],
+      "sourceText": "选一个最近几天的连续两小时没人的最便宜的场地，13点前或者17点以后都行，尽量不要在边上的Court 3和Court 6",
+      "updatedAt": "2026-09-03T16:02:11.697Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_003",
+    "input": "今天晚上想打一个小时，哪个场便宜订哪个",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 1,
+      "searchScope": {
+        "days": 1,
+        "dateRange": {
+          "type": "today",
+          "sourceText": "今天"
+        },
+        "timeWindow": {
+          "period": "evening"
+        },
+        "sourceText": "今天晚上"
+      },
+      "preferences": [],
+      "hardConstraints": [
+        {
+          "feature": "duration",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "打一个小时",
+          "direction": "higher",
+          "value": "60",
+          "rule": {
+            "exactMinutes": 60
+          }
+        }
+      ],
+      "objectives": [
+        {
+          "feature": "price",
+          "direction": "minimize",
+          "priority": "high",
+          "sourceText": "便宜订哪个"
+        }
+      ],
+      "unresolvedPreferences": [],
+      "sourceText": "今天晚上想打一个小时，哪个场便宜订哪个",
+      "updatedAt": "2026-09-03T16:02:19.150Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_004",
+    "input": "价格无所谓，主要是后一小时也得空着，我想尽量多打一会儿",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "价格无所谓，主要是后一小时也得空着，我想尽量多打一会儿"
+      },
+      "preferences": [],
+      "hardConstraints": [
+        {
+          "feature": "next_hour_free",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "后一小时也得空着",
+          "target": true,
+          "rule": {
+            "preferredMinutes": 60
+          }
+        }
+      ],
+      "objectives": [
+        {
+          "feature": "duration",
+          "direction": "maximize",
+          "priority": "high",
+          "sourceText": "我想尽量多打一会儿"
+        }
+      ],
+      "unresolvedPreferences": [],
+      "sourceText": "价格无所谓，主要是后一小时也得空着，我想尽量多打一会儿",
+      "updatedAt": "2026-09-03T16:02:23.203Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_005",
+    "input": "悉大Court 4、5、6优先吧，实在没有的话其他场也行",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "悉大Court 4、5、6优先吧，实在没有的话其他场也行"
+      },
+      "preferences": [
+        {
+          "feature": "court",
+          "type": "soft",
+          "importance": "medium",
+          "priority": "medium",
+          "relaxable": true,
+          "relaxationDirection": "include_nonpreferred",
+          "sourceText": "悉大Court 4、5、6优先吧",
+          "direction": "preferred",
+          "target": true,
+          "rule": {
+            "include": [
+              "Court 4",
+              "Court 5",
+              "Court 6"
+            ]
+          }
+        }
+      ],
+      "hardConstraints": [],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "悉大Court 4、5、6优先吧，实在没有的话其他场也行",
+      "updatedAt": "2026-09-03T16:02:26.363Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_006",
+    "input": "只看usyd的Court 4、5、6，其他场不用推荐",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "只看usyd的Court 4、5、6，其他场不用推荐"
+      },
+      "preferences": [],
+      "hardConstraints": [
+        {
+          "feature": "venue",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "只看usyd的Court 4、5、6，其他场不用推荐",
+          "target": true,
+          "rule": {
+            "include": [
+              "usyd"
+            ]
+          }
+        },
+        {
+          "feature": "court",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "只看usyd的Court 4、5、6，其他场不用推荐",
+          "target": true,
+          "rule": {
+            "include": [
+              "Court 4",
+              "Court 5",
+              "Court 6"
+            ]
+          }
+        }
+      ],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "只看usyd的Court 4、5、6，其他场不用推荐",
+      "updatedAt": "2026-09-03T16:02:30.125Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_007",
+    "input": "最好早上打，不过晚上也可以，中午不想打",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "最好早上打，不过晚上也可以，中午不想打"
+      },
+      "preferences": [
+        {
+          "feature": "start_time",
+          "type": "soft",
+          "importance": "medium",
+          "priority": "medium",
+          "relaxable": true,
+          "relaxationDirection": "wider_time_window",
+          "sourceText": "最好早上打，不过晚上也可以",
+          "direction": "preferred",
+          "rule": {
+            "period": "morning"
+          }
+        },
+        {
+          "feature": "start_time",
+          "type": "soft",
+          "importance": "low",
+          "priority": "low",
+          "relaxable": true,
+          "relaxationDirection": "wider_time_window",
+          "sourceText": "不过晚上也可以",
+          "direction": "preferred",
+          "rule": {
+            "period": "evening"
+          }
+        },
+        {
+          "feature": "start_time",
+          "type": "soft",
+          "importance": "low",
+          "priority": "low",
+          "relaxable": true,
+          "relaxationDirection": "wider_time_window",
+          "sourceText": "中午不想打",
+          "direction": "avoid",
+          "rule": {
+            "period": "midday"
+          }
+        }
+      ],
+      "hardConstraints": [],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "最好早上打，不过晚上也可以，中午不想打",
+      "updatedAt": "2026-09-03T16:02:35.332Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_008",
+    "input": "17点以后都可以，越早越好",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "timeWindow": {
+          "after": "17:00"
+        },
+        "sourceText": "17点以后都可以，越早越好"
+      },
+      "preferences": [],
+      "hardConstraints": [
+        {
+          "feature": "start_time",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "17点以后都可以",
+          "direction": "later",
+          "rule": {
+            "after": "17:00"
+          }
+        }
+      ],
+      "objectives": [
+        {
+          "feature": "start_time",
+          "direction": "earlier",
+          "priority": "medium",
+          "sourceText": "越早越好"
+        }
+      ],
+      "unresolvedPreferences": [],
+      "sourceText": "17点以后都可以，越早越好",
+      "updatedAt": "2026-09-03T16:02:40.956Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_009",
+    "input": "明天13点到17点我有课，这段时间肯定不行，其他时间随便",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 1,
+      "searchScope": {
+        "days": 1,
+        "dateRange": {
+          "type": "tomorrow",
+          "sourceText": "明天"
+        },
+        "timeWindow": {
+          "before": "13:00",
+          "after": "17:00"
+        },
+        "sourceText": "明天13点到17点我有课，这段时间肯定不行，其他时间随便"
+      },
+      "preferences": [],
+      "hardConstraints": [
+        {
+          "feature": "start_time",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "明天13点到17点我有课，这段时间肯定不行",
+          "direction": "avoid",
+          "rule": {
+            "before": "13:00",
+            "after": "17:00"
+          }
+        }
+      ],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "明天13点到17点我有课，这段时间肯定不行，其他时间随便",
+      "updatedAt": "2026-09-03T16:02:44.565Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_010",
+    "input": "这周随便找一天吧，天气舒服一点最好，时间我无所谓",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "dateRange": {
+          "type": "this_week",
+          "sourceText": "这周"
+        },
+        "sourceText": "这周随便找一天吧 时间我无所谓"
+      },
+      "preferences": [
+        {
+          "feature": "weather",
+          "type": "soft",
+          "importance": "medium",
+          "priority": "medium",
+          "relaxable": true,
+          "relaxationDirection": "ask_user",
+          "sourceText": "天气舒服一点最好",
+          "direction": "preferred",
+          "value": "comfortable",
+          "rule": {
+            "condition": "comfortable"
+          }
+        }
+      ],
+      "hardConstraints": [],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "这周随便找一天吧，天气舒服一点最好，时间我无所谓",
+      "updatedAt": "2026-09-03T16:02:49.154Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_011",
+    "input": "别下雨就行，其他都好说",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "别下雨就行，其他都好说"
+      },
+      "preferences": [
+        {
+          "feature": "weather",
+          "type": "soft",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": true,
+          "relaxationDirection": "ask_user",
+          "sourceText": "别下雨就行",
+          "direction": "avoid",
+          "target": true,
+          "rule": {
+            "condition": "no_rain"
+          }
+        }
+      ],
+      "hardConstraints": [
+        {
+          "feature": "weather",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "别下雨就行",
+          "rule": {
+            "condition": "no_rain"
+          }
+        }
+      ],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "别下雨就行，其他都好说",
+      "updatedAt": "2026-09-03T16:02:52.507Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_012",
+    "input": "天气不用太好，只要别热得离谱，便宜更重要",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "天气不用太好，只要别热得离谱，便宜更重要"
+      },
+      "preferences": [
+        {
+          "feature": "weather",
+          "type": "soft",
+          "importance": "medium",
+          "priority": "medium",
+          "relaxable": true,
+          "relaxationDirection": "ask_user",
+          "sourceText": "只要别热得离谱",
+          "direction": "avoid",
+          "value": "not_too_hot",
+          "rule": {
+            "condition": "not_too_hot"
+          }
+        }
+      ],
+      "hardConstraints": [],
+      "objectives": [
+        {
+          "feature": "price",
+          "direction": "minimize",
+          "priority": "high",
+          "sourceText": "便宜更重要"
+        }
+      ],
+      "unresolvedPreferences": [],
+      "sourceText": "天气不用太好，只要别热得离谱，便宜更重要",
+      "updatedAt": "2026-09-03T16:02:55.828Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_013",
+    "input": "超过35刀我就不订了，最好还能连续打两个小时",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "超过35刀我就不订了，最好还能连续打两个小时"
+      },
+      "preferences": [
+        {
+          "feature": "consecutive_availability",
+          "type": "soft",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": true,
+          "relaxationDirection": "shorter_duration",
+          "sourceText": "最好还能连续打两个小时",
+          "direction": "higher",
+          "target": true,
+          "rule": {
+            "minMinutes": 120,
+            "preferredMinutes": 120
+          }
+        }
+      ],
+      "hardConstraints": [
+        {
+          "feature": "price",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "超过35刀我就不订了",
+          "direction": "lower",
+          "target": true,
+          "rule": {
+            "max": 35
+          }
+        }
+      ],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "超过35刀我就不订了，最好还能连续打两个小时",
+      "updatedAt": "2026-09-03T16:02:59.812Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_014",
+    "input": "贵一点没事，只要时间合适，而且后一小时没人",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "只要时间合适"
+      },
+      "preferences": [],
+      "hardConstraints": [
+        {
+          "feature": "consecutive_availability",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "后一小时没人",
+          "rule": {
+            "minMinutes": 120
+          }
+        }
+      ],
+      "objectives": [],
+      "unresolvedPreferences": [
+        {
+          "text": "只要时间合适",
+          "reason": "ambiguous_time_suitability",
+          "sourceText": "只要时间合适"
+        }
+      ],
+      "sourceText": "贵一点没事，只要时间合适，而且后一小时没人",
+      "updatedAt": "2026-09-03T16:03:03.076Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_015",
+    "input": "给我找最便宜的就行，Court几、天气怎么样我都不在乎",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "给我找最便宜的就行，Court几、天气怎么样我都不在乎"
+      },
+      "preferences": [],
+      "hardConstraints": [],
+      "objectives": [
+        {
+          "feature": "price",
+          "direction": "minimize",
+          "priority": "high",
+          "sourceText": "找最便宜的就行"
+        }
+      ],
+      "unresolvedPreferences": [],
+      "sourceText": "给我找最便宜的就行，Court几、天气怎么样我都不在乎",
+      "updatedAt": "2026-09-03T16:03:06.714Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_016",
+    "input": "我想和朋友一起订三个连续的场，必须挨在一起",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "我想和朋友一起订三个连续的场"
+      },
+      "preferences": [],
+      "hardConstraints": [
+        {
+          "feature": "court_count",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "订三个连续的场",
+          "rule": {
+            "exact": 3
+          }
+        },
+        {
+          "feature": "adjacency",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "必须挨在一起",
+          "rule": {
+            "required": true
+          }
+        }
+      ],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "我想和朋友一起订三个连续的场，必须挨在一起",
+      "updatedAt": "2026-09-03T16:03:10.243Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_017",
+    "input": "我们大概三个人打，最好找两块挨着的场，不过分开也不是不行",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "我们大概三个人打，最好找两块挨着的场，不过分开也不是不行"
+      },
+      "preferences": [
+        {
+          "feature": "adjacency",
+          "type": "soft",
+          "importance": "medium",
+          "priority": "medium",
+          "relaxable": true,
+          "relaxationDirection": "non_adjacent_courts",
+          "sourceText": "最好找两块挨着的场，不过分开也不是不行",
+          "direction": "preferred",
+          "target": true,
+          "rule": {
+            "preferred": true
+          }
+        }
+      ],
+      "hardConstraints": [
+        {
+          "feature": "court_count",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "找两块挨着的场",
+          "value": "2",
+          "rule": {
+            "exact": 2
+          }
+        }
+      ],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "我们大概三个人打，最好找两块挨着的场，不过分开也不是不行",
+      "updatedAt": "2026-09-03T16:03:13.906Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_018",
+    "input": "最近几天帮我挑一个你觉得最合适的，我没什么特别要求",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 3,
+      "searchScope": {
+        "days": 3,
+        "dateRange": {
+          "type": "next_few_days",
+          "sourceText": "最近几天"
+        },
+        "sourceText": "最近几天"
+      },
+      "preferences": [],
+      "hardConstraints": [],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "最近几天帮我挑一个你觉得最合适的，我没什么特别要求",
+      "updatedAt": "2026-09-03T16:03:18.125Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_019",
+    "input": "周末想打球，不想起太早，也别太晚，便宜一点就更好了",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 2,
+      "searchScope": {
+        "days": 2,
+        "dateRange": {
+          "type": "weekend",
+          "sourceText": "周末"
+        },
+        "sourceText": "周末"
+      },
+      "preferences": [
+        {
+          "feature": "start_time",
+          "type": "soft",
+          "importance": "medium",
+          "priority": "medium",
+          "relaxable": true,
+          "relaxationDirection": "wider_time_window",
+          "sourceText": "不想起太早，也别太晚",
+          "direction": "avoid",
+          "rule": {
+            "period": "not_too_early"
+          }
+        },
+        {
+          "feature": "start_time",
+          "type": "soft",
+          "importance": "medium",
+          "priority": "medium",
+          "relaxable": true,
+          "relaxationDirection": "wider_time_window",
+          "sourceText": "不想起太早，也别太晚",
+          "direction": "avoid",
+          "rule": {
+            "period": "not_too_late"
+          }
+        },
+        {
+          "feature": "price",
+          "type": "soft",
+          "importance": "medium",
+          "priority": "medium",
+          "relaxable": true,
+          "relaxationDirection": "higher_price",
+          "sourceText": "便宜一点就更好了",
+          "direction": "lower"
+        }
+      ],
+      "hardConstraints": [],
+      "objectives": [],
+      "unresolvedPreferences": [],
+      "sourceText": "周末想打球，不想起太早，也别太晚，便宜一点就更好了",
+      "updatedAt": "2026-09-03T16:03:21.113Z"
+    },
+    "human_review": null
+  },
+  {
+    "id": "case_020",
+    "input": "我下午有事，晚上可能也有安排，你先看看有什么场再说",
+    "output": {
+      "version": 2,
+      "searchWindowDays": 7,
+      "searchScope": {
+        "days": 7,
+        "sourceText": "你先看看有什么场再说"
+      },
+      "preferences": [],
+      "hardConstraints": [
+        {
+          "feature": "start_time",
+          "type": "hard",
+          "importance": "high",
+          "priority": "high",
+          "relaxable": false,
+          "sourceText": "我下午有事",
+          "direction": "avoid",
+          "rule": {
+            "period": "afternoon"
+          }
+        }
+      ],
+      "objectives": [],
+      "unresolvedPreferences": [
+        {
+          "text": "晚上可能也有安排",
+          "sourceText": "晚上可能也有安排"
+        }
+      ],
+      "sourceText": "我下午有事，晚上可能也有安排，你先看看有什么场再说",
+      "updatedAt": "2026-09-03T16:03:25.833Z"
+    },
+    "human_review": null
+  }
+]

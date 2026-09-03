@@ -1,18 +1,22 @@
 {
-  "version": 1,
+  "version": 2,
   "searchWindowDays": 7,
+  "searchScope": {
+    "days": 7,
+    "sourceText": "最近几天"
+  },
   "preferences": [
     {
-      "feature": "price",
+      "feature": "consecutive_availability",
       "type": "soft",
-      "direction": "lower",
-      "importance": "high"
-    },
-    {
-      "feature": "next_hour_free",
-      "type": "soft",
-      "target": true,
-      "importance": "high"
+      "rule": {
+        "preferredMinutes": 120
+      },
+      "importance": "high",
+      "priority": "high",
+      "relaxable": true,
+      "relaxationDirection": "ask_user",
+      "sourceText": "最好后一小时也没人"
     },
     {
       "feature": "start_time",
@@ -21,10 +25,22 @@
         "before": "13:00",
         "after": "17:00"
       },
-      "importance": "medium"
+      "importance": "medium",
+      "priority": "medium",
+      "relaxable": true,
+      "relaxationDirection": "wider_time_window",
+      "sourceText": "13点前或者17点以后都行"
     }
   ],
   "hardConstraints": [],
+  "objectives": [
+    {
+      "feature": "price",
+      "direction": "minimize",
+      "priority": "high",
+      "sourceText": "我主要想便宜"
+    }
+  ],
   "unresolvedPreferences": [],
   "sourceText": "我主要想便宜，最好后一小时也没人，13点前或者17点以后都行",
   "updatedAt": "2026-09-01T00:00:00.000Z"
