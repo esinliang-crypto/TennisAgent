@@ -25,7 +25,11 @@ async function loadPreferenceProfile({ path = DEFAULT_PREFERENCE_PATH } = {}) {
   }
 
   const profile = JSON.parse(text);
-  return validatePreferenceProfile(profile);
+  const normalized = normalizePreferenceProfile(profile, {
+    sourceText: profile.sourceText,
+    updatedAt: profile.updatedAt,
+  });
+  return validatePreferenceProfile(normalized);
 }
 
 async function savePreferenceProfile(profile, {

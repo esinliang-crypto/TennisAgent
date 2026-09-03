@@ -2,6 +2,7 @@ import {
   allowedDirections,
   allowedFeatures,
   allowedImportance,
+  allowedRelaxationDirections,
 } from './schema.mjs';
 
 const timeSchema = {
@@ -23,7 +24,18 @@ const ruleSchema = {
 const softPreferenceSchema = {
   type: 'object',
   additionalProperties: false,
-  required: ['feature', 'type', 'importance', 'direction', 'target', 'rule'],
+  required: [
+    'feature',
+    'type',
+    'importance',
+    'priority',
+    'relaxable',
+    'relaxationDirection',
+    'sourceText',
+    'direction',
+    'target',
+    'rule',
+  ],
   properties: {
     feature: {
       type: 'string',
@@ -36,6 +48,20 @@ const softPreferenceSchema = {
     importance: {
       type: 'string',
       enum: [...allowedImportance],
+    },
+    priority: {
+      type: 'string',
+      enum: [...allowedImportance],
+    },
+    relaxable: {
+      type: 'boolean',
+    },
+    relaxationDirection: {
+      type: ['string', 'null'],
+      enum: [...allowedRelaxationDirections, null],
+    },
+    sourceText: {
+      type: ['string', 'null'],
     },
     direction: {
       type: ['string', 'null'],
@@ -51,7 +77,18 @@ const softPreferenceSchema = {
 const hardConstraintSchema = {
   type: 'object',
   additionalProperties: false,
-  required: ['feature', 'type', 'importance', 'direction', 'target', 'rule'],
+  required: [
+    'feature',
+    'type',
+    'importance',
+    'priority',
+    'relaxable',
+    'relaxationDirection',
+    'sourceText',
+    'direction',
+    'target',
+    'rule',
+  ],
   properties: {
     feature: {
       type: 'string',
@@ -64,6 +101,21 @@ const hardConstraintSchema = {
     importance: {
       type: 'string',
       enum: [...allowedImportance],
+    },
+    priority: {
+      type: 'string',
+      enum: [...allowedImportance],
+    },
+    relaxable: {
+      type: 'boolean',
+      enum: [false],
+    },
+    relaxationDirection: {
+      type: ['string', 'null'],
+      enum: [null],
+    },
+    sourceText: {
+      type: ['string', 'null'],
     },
     direction: {
       type: ['string', 'null'],

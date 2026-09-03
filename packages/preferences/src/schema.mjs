@@ -13,6 +13,16 @@ const allowedFeatures = new Set([
 const allowedImportance = new Set(['high', 'medium', 'low', 'uncertain']);
 const allowedTypes = new Set(['hard', 'soft']);
 const allowedDirections = new Set(['lower', 'higher', 'earlier', 'later', 'preferred', 'avoid']);
+const allowedRelaxationDirections = new Set([
+  'higher_price',
+  'lower_quality',
+  'wider_time_window',
+  'wider_date_window',
+  'wider_radius',
+  'include_nonpreferred',
+  'other_venues',
+  'ask_user',
+]);
 
 const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -38,7 +48,17 @@ function stripNullableOptionals(value) {
 
   const copy = {};
   for (const [key, child] of Object.entries(value)) {
-    if (child === null && ['direction', 'target', 'rule', 'value', 'before', 'after', 'equals'].includes(key)) {
+    if (child === null && [
+      'direction',
+      'target',
+      'rule',
+      'value',
+      'before',
+      'after',
+      'equals',
+      'relaxationDirection',
+      'sourceText',
+    ].includes(key)) {
       continue;
     }
     copy[key] = stripNullableOptionals(child);
@@ -93,6 +113,10 @@ function mergeStartTimeWindows(preferences) {
       feature: 'start_time',
       type: preference.type,
       importance: preference.importance,
+      priority: preference.priority,
+      relaxable: preference.relaxable,
+      relaxationDirection: preference.relaxationDirection,
+      sourceText: preference.sourceText,
       rule: {
         before: before ?? counterpart.rule.before,
         after: after ?? counterpart.rule.after,
@@ -129,7 +153,19 @@ function validatePreference(preference, path, { requireHardType = false } = {}) 
   }
 
   for (const key of Object.keys(preference)) {
-    if (!['feature', 'type', 'importance', 'direction', 'target', 'rule', 'value'].includes(key)) {
+    if (![
+      'feature',
+      'type',
+      'importance',
+      'priority',
+      'relaxable',
+      'relaxationDirection',
+      'sourceText',
+      'direction',
+      'target',
+      'rule',
+      'value',
+    ].includes(key)) {
       issues.push(`${path}.${key} is not allowed`);
     }
   }
@@ -148,6 +184,31 @@ function validatePreference(preference, path, { requireHardType = false } = {}) 
 
   if (!allowedImportance.has(preference.importance)) {
     issues.push(`${path}.importance must be high, medium, low, or uncertain`);
+  }
+
+  if (!allowedImportance.has(preference.priority)) {
+    issues.push(`${path}.priority must be high, medium, low, or uncertain`);
+  }
+
+  if (preference.importance !== preference.priority) {
+    issues.push(`${path}.importance must match priority`);
+  }
+
+  if (typeof preference.relaxable !== 'boolean') {
+    issues.push(`${path}.relaxable must be boolean`);
+  }
+
+  if (preference.type === 'hard' && preference.relaxable !== false) {
+    issues.push(`${path}.relaxable must be false for hard constraints`);
+  }
+
+  if (preference.relaxationDirection !== undefined
+    && !allowedRelaxationDirections.has(preference.relaxationDirection)) {
+    issues.push(`${path}.relaxationDirection is not allowed`);
+  }
+
+  if (preference.sourceText !== undefined && typeof preference.sourceText !== 'string') {
+    issues.push(`${path}.sourceText must be a string`);
   }
 
   if (preference.direction !== undefined && !allowedDirections.has(preference.direction)) {
@@ -172,7 +233,34 @@ function normalizePreferenceProfile(profile, { sourceText, updatedAt = new Date(
   normalized.unresolvedPreferences = normalized.unresolvedPreferences ?? [];
   normalized.sourceText = sourceText ?? normalized.sourceText ?? '';
   normalized.updatedAt = updatedAt;
+  normalized.preferences = normalized.preferences.map((preference) => normalizePreferenceMetadata(preference, {
+    defaultSourceText: normalized.sourceText,
+  }));
+  normalized.hardConstraints = normalized.hardConstraints.map((constraint) => normalizePreferenceMetadata(constraint, {
+    defaultSourceText: normalized.sourceText,
+    forceHard: true,
+  }));
   normalized.preferences = mergeStartTimeWindows(normalized.preferences);
+  return normalized;
+}
+
+function inferRelaxationDirection(preference) {
+  if (preference.relaxationDirection !== undefined) return preference.relaxationDirection;
+  if (preference.feature === 'price') return 'higher_price';
+  if (preference.feature === 'start_time') return 'wider_time_window';
+  if (preference.feature === 'court') return 'include_nonpreferred';
+  if (preference.feature === 'venue') return 'other_venues';
+  return undefined;
+}
+
+function normalizePreferenceMetadata(preference, { defaultSourceText = '', forceHard = false } = {}) {
+  const normalized = { ...preference };
+  normalized.type = forceHard ? 'hard' : normalized.type;
+  normalized.priority = normalized.priority ?? normalized.importance ?? 'uncertain';
+  normalized.importance = normalized.importance ?? normalized.priority;
+  normalized.relaxable = normalized.type === 'hard' ? false : (normalized.relaxable ?? true);
+  normalized.relaxationDirection = normalized.relaxable ? inferRelaxationDirection(normalized) : undefined;
+  normalized.sourceText = normalized.sourceText ?? defaultSourceText;
   return normalized;
 }
 
@@ -241,6 +329,7 @@ export {
   allowedDirections,
   allowedFeatures,
   allowedImportance,
+  allowedRelaxationDirections,
   allowedTypes,
   normalizePreferenceProfile,
   validatePreferenceProfile,
