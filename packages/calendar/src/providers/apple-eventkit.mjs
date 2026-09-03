@@ -40,7 +40,11 @@ function normalizeAppleNativeResult(raw) {
 }
 
 function parseAppleHelperStdout(stdout) {
-  const text = stdout.trim();
+  const text = stdout
+    .trim()
+    .split(/\r?\n/)
+    .reverse()
+    .find((line) => line.trim().startsWith('{'));
   if (!text) {
     throw new AppleCalendarProviderError('APPLE_MALFORMED_RESPONSE', 'Apple Calendar helper did not return JSON');
   }

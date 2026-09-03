@@ -72,6 +72,18 @@ test('Apple provider parses success JSON without leaking event content', () => {
   assert.equal(JSON.stringify(result).includes('private'), false);
 });
 
+test('Apple provider parses JSON when SwiftPM build logs precede helper output', () => {
+  const result = parseAppleHelperStdout([
+    "Building for debugging...",
+    "[0/3] Write swift-version.txt",
+    '{"source":"apple_eventkit","status":"available","permission":"granted","busy":[]}',
+  ].join('\n'));
+
+  assert.equal(result.source, 'apple_eventkit');
+  assert.equal(result.status, 'available');
+  assert.deepEqual(result.busy, []);
+});
+
 test('Apple provider reports permission required', () => {
   assert.throws(
     () => normalizeAppleNativeResult({
@@ -343,6 +355,54 @@ test('Apple provider result enriches candidates through unified contract', async
   assert.equal(enriched.features.calendar.source, 'apple_eventkit');
 });
 
+test('available Apple empty busy array enriches candidates as free, not unknown', async () => {
+  const [enriched] = await enrichCandidates({
+    candidates: [candidate()],
+    weatherAdapter: async ({ slots }) => slots.map((slot) => ({ candidateId: slot.id, startTime: slot.startTime, forecastAvailable: false })),
+    calendarAdapter: async () => ({
+      source: 'apple_eventkit',
+      status: 'available',
+      busy: [],
+    }),
+  });
+
+  assert.equal(enriched.features.calendar.free, true);
+  assert.equal(enriched.features.calendar.status, 'available');
+  assert.equal(enriched.features.calendar.source, 'apple_eventkit');
+});
+
+test('available non-overlapping busy interval enriches candidates as free', async () => {
+  const [enriched] = await enrichCandidates({
+    candidates: [candidate()],
+    weatherAdapter: async ({ slots }) => slots.map((slot) => ({ candidateId: slot.id, startTime: slot.startTime, forecastAvailable: false })),
+    calendarAdapter: async () => ({
+      source: 'apple_eventkit',
+      status: 'available',
+      busy: [
+        { start: '2026-09-03T08:00:00.000Z', end: '2026-09-03T09:00:00.000Z' },
+      ],
+    }),
+  });
+
+  assert.equal(enriched.features.calendar.free, true);
+});
+
+test('available overlapping busy interval enriches candidates as busy', async () => {
+  const [enriched] = await enrichCandidates({
+    candidates: [candidate()],
+    weatherAdapter: async ({ slots }) => slots.map((slot) => ({ candidateId: slot.id, startTime: slot.startTime, forecastAvailable: false })),
+    calendarAdapter: async () => ({
+      source: 'apple_eventkit',
+      status: 'available',
+      busy: [
+        { start: '2026-09-03T09:30:00.000Z', end: '2026-09-03T10:30:00.000Z' },
+      ],
+    }),
+  });
+
+  assert.equal(enriched.features.calendar.free, false);
+});
+
 test('Google provider fallback result enriches candidates through unified contract', async () => {
   const [enriched] = await enrichCandidates({
     candidates: [candidate()],
@@ -358,6 +418,28 @@ test('Google provider fallback result enriches candidates through unified contra
 
   assert.equal(enriched.features.calendar.source, 'google_freebusy');
   assert.equal(enriched.features.calendar.fallbackReason, 'APPLE_UNAVAILABLE');
+});
+
+test('Apple and Google available empty busy contracts enrich identically except source', async () => {
+  async function enrichedFor(source) {
+    const [enriched] = await enrichCandidates({
+      candidates: [candidate()],
+      weatherAdapter: async ({ slots }) => slots.map((slot) => ({ candidateId: slot.id, startTime: slot.startTime, forecastAvailable: false })),
+      calendarAdapter: async () => ({
+        source,
+        status: 'available',
+        busy: [],
+      }),
+    });
+    return enriched.features.calendar;
+  }
+
+  const apple = await enrichedFor('apple_eventkit');
+  const google = await enrichedFor('google_freebusy');
+
+  assert.equal(apple.free, true);
+  assert.equal(google.free, true);
+  assert.equal(apple.status, google.status);
 });
 
 test('calendar unavailable enriches as unknown, not free', () => {
